@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wamufi.signindemo.LogHelper
+import com.wamufi.signindemo.signin.KakaoSignInManager
 import com.wamufi.signindemo.signin.LoginType
 import com.wamufi.signindemo.signin.NaverSignInManager
+import com.wamufi.signindemo.signin.SignInManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,29 +25,47 @@ data class LoginUiState(var isLoading: Boolean = false,
     var errorMessage: String = "")
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val naverSignInManager: NaverSignInManager) : ViewModel() {
+class SignInViewModel @Inject constructor(private val naverSignInManager: NaverSignInManager,
+    private val kakaoSignInManager: KakaoSignInManager) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun signIn(type: LoginType, context: Context) {
+    private val managerMap = mapOf(
+//        LoginType.GOOGLE to googleSignInManager,
+//        LoginType.APPLE to appleSignInManager,
+        LoginType.NAVER to naverSignInManager, LoginType.KAKAO to kakaoSignInManager)
+
+    private fun getManager(type: LoginType): SignInManager {
+        return managerMap[type] ?: throw IllegalArgumentException("Invalid login type")
+    }
+
+    /**
+     * 로그인 (네이버는 context 필수)
+     */
+    fun signIn(type: LoginType, context: Context? = null) {
         viewModelScope.launch {
-//            val result = naverSignInManager.signIn()
-            val result = naverSignInManager.signInWithNaver(context)
-            result.onSuccess {
+            getManager(type).signIn(context).onSuccess { token ->
                 _uiState.update { uiState ->
-                    uiState.copy(isLoading = false, isLoggedIn = true, token = it)
+                    uiState.copy(isLoading = false, isLoggedIn = true, token = token)
                 }
 
-                getProfile()
-            }
-            result.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
+                getProfile(type)
+            }.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
         }
     }
 
-    private suspend fun getProfile() {
+    private suspend fun getProfile(type: LoginType) {
+        when (type) {
+            LoginType.GOOGLE -> getGoogleUserProfile()
+            LoginType.APPLE -> getAppleUserProfile()
+            LoginType.NAVER -> getNaverUserProfile()
+            LoginType.KAKAO -> getKakaoUserProfile()
+        }
+    }
+
+    private suspend fun getNaverUserProfile() {
         naverSignInManager.callNaverProfile().onSuccess {
-            LogHelper.d(it)
             _uiState.update { uiState ->
                 uiState.copy(nickName = it.profile?.nickname,
                     profileImage = it.profile?.profileImage,
@@ -54,15 +74,45 @@ class SignInViewModel @Inject constructor(private val naverSignInManager: NaverS
         }.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
     }
 
-    fun signOut(type: LoginType) {
-        naverSignInManager.signOutWithNaver()
+    private suspend fun getKakaoUserProfile() {
+        kakaoSignInManager.fetchUserInfo().onSuccess {
+            _uiState.update { uiState ->
+                uiState.copy(nickName = it.kakaoAccount?.profile?.nickname,
+                    profileImage = it.kakaoAccount?.profile?.profileImageUrl,
+                    name = it.kakaoAccount?.name)
+            }
+        }.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
     }
 
-    fun deleteToken(type: LoginType) {
+    private suspend fun getGoogleUserProfile() {
+
+    }
+
+    private suspend fun getAppleUserProfile() {
+        
+    }
+
+    /**
+     * 로그아웃
+     */
+    fun signOut(type: LoginType) {
         viewModelScope.launch {
-            naverSignInManager.deleteNaverToken().onSuccess {
-                    _uiState.value = LoginUiState()
-                }.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
+            getManager(type).signOut().onSuccess {
+                _uiState.update { uiState ->
+                    uiState.copy(isLoggedIn = false, token = "")
+                }
+            }.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
+        }
+    }
+
+    /**
+     * 연동 해제
+     */
+    fun revokeAccess(type: LoginType) {
+        viewModelScope.launch {
+            getManager(type).revokeAccess().onSuccess {
+                _uiState.value = LoginUiState()
+            }.onFailure { _uiState.value = LoginUiState(errorMessage = it.message.toString()) }
         }
     }
 }

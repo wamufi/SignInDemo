@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.kakao.sdk.common.util.Utility
 import com.wamufi.signindemo.signin.SignInManager
 import com.wamufi.signindemo.ui.SignInScreen
 import com.wamufi.signindemo.ui.theme.SignInDemoTheme
@@ -31,6 +32,9 @@ class MainActivity : ComponentActivity() {
                 SignInScreen()
             }
         }
+
+        val kakaoKeyHash = Utility.getKeyHash(this)
+        LogHelper.i("kakaoKeyHash: $kakaoKeyHash")
     }
 }
 

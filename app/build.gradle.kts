@@ -9,8 +9,7 @@ plugins {
     id("kotlin-kapt")
 }
 
-val naverClientId: String = gradleLocalProperties(rootDir, providers).getProperty("naver_client_id")
-val naverClientSecret: String = gradleLocalProperties(rootDir, providers).getProperty("naver_client_secret")
+
 
 android {
     namespace = "com.wamufi.signindemo"
@@ -24,12 +23,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val naverClientId: String = gradleLocalProperties(rootDir, providers).getProperty("naver_client_id")
+        val naverClientSecret: String = gradleLocalProperties(rootDir, providers).getProperty("naver_client_secret")
+        val kakaoAppKey: String = gradleLocalProperties(rootDir, providers).getProperty("kakao_app_key")
+        val kakaoManifestAppKey: String = gradleLocalProperties(rootDir, providers).getProperty("kakao_manifest_app_key")
+
+        buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
+        buildConfigField("String", "NAVER_CLIENT_SECRET", naverClientSecret)
+        buildConfigField("String", "KAKAO_APP_KEY", kakaoAppKey)
+        manifestPlaceholders["KAKAO_MANIFEST_APP_KEY"] = kakaoManifestAppKey
     }
 
     buildTypes {
         debug {
-            buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
-            buildConfigField("String", "NAVER_CLIENT_SECRET", naverClientSecret)
+
         }
         release {
             isMinifyEnabled = false
@@ -73,4 +81,5 @@ dependencies {
 
     // Sign in
     implementation(libs.naver.oauth) // 네이버
+    implementation(libs.kakao.user) // 카카오
 }

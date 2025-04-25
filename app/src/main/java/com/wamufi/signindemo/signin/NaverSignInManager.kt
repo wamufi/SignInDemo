@@ -12,9 +12,12 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class NaverSignInManager @Inject constructor(private val context: Context) {
+class NaverSignInManager @Inject constructor(private val context: Context) : SignInManager {
 
-//    override suspend fun signIn(): Result<String> = signInWithNaver()
+    override suspend fun signIn(context: Context?): Result<String> = signInWithNaver(context!!)
+    override suspend fun signOut(): Result<Unit> = signOutWithNaver()
+    override suspend fun revokeAccess(): Result<Unit> = deleteNaverToken()
+//    override suspend fun getProfile(): Result<NidProfileResponse> = callNaverProfile()
 
     /// 네이버 로그인
     /// FLAG_ACTIVITY_NEW_TASK 업데이트 되면 context 외부에서 전달받지 않고 사용
@@ -63,15 +66,17 @@ class NaverSignInManager @Inject constructor(private val context: Context) {
     }
 
     /// 네이버 로그아웃
-    fun signOutWithNaver() {
+    fun signOutWithNaver(): Result<Unit> {
         NaverIdLoginSDK.logout()
         if (NaverIdLoginSDK.getState() == NidOAuthLoginState.NEED_LOGIN) {
-
+            return Result.success(Unit)
+        } else {
+            return Result.failure(Exception("Logout failed."))
         }
     }
 
     /// 네이버 연동 해제 (토큰 삭제)
-    suspend fun deleteNaverToken(): Result<String> = suspendCoroutine { continuation ->
+    suspend fun deleteNaverToken(): Result<Unit> = suspendCoroutine { continuation ->
         val oAuthLoginCallback = object : OAuthLoginCallback {
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
@@ -85,9 +90,8 @@ class NaverSignInManager @Inject constructor(private val context: Context) {
             }
 
             override fun onSuccess() {
-                continuation.resume(Result.success("Access token is deleted."))
+                continuation.resume(Result.success(Unit))
             }
-
         }
 
         NidOAuthLogin().callDeleteTokenApi(oAuthLoginCallback)

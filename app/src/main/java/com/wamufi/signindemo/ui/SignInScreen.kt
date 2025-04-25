@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.Group
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,7 +65,34 @@ fun SignInScreen(viewModel: SignInViewModel = hiltViewModel()) {
                     }
 
                     Button(onClick = {
-                        viewModel.deleteToken(LoginType.NAVER)
+                        viewModel.revokeAccess(LoginType.NAVER)
+                    }) {
+                        Text("연동 해제")
+                    }
+                }
+            }
+
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("카카오", style = MaterialTheme.typography.titleMedium)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Button(onClick = {
+//                viewModel.signIn(LoginType.NAVER)
+                        viewModel.signIn(LoginType.KAKAO, context)
+                    }) {
+                        Text("로그인")
+                    }
+
+                    Button(onClick = {
+                        viewModel.signOut(LoginType.KAKAO)
+                    }) {
+                        Text("로그아웃")
+                    }
+
+                    Button(onClick = {
+                        viewModel.revokeAccess(LoginType.KAKAO)
                     }) {
                         Text("연동 해제")
                     }
