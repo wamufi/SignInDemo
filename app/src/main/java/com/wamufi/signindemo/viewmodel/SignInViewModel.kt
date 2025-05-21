@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wamufi.signindemo.LogHelper
+import com.wamufi.signindemo.signin.GoogleSignInManager
 import com.wamufi.signindemo.signin.KakaoSignInManager
 import com.wamufi.signindemo.signin.LoginType
 import com.wamufi.signindemo.signin.NaverSignInManager
@@ -26,13 +27,13 @@ data class LoginUiState(var isLoading: Boolean = false,
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(private val naverSignInManager: NaverSignInManager,
-    private val kakaoSignInManager: KakaoSignInManager) : ViewModel() {
+    private val kakaoSignInManager: KakaoSignInManager, private val googleSignInManager: GoogleSignInManager) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
     private val managerMap = mapOf(
-//        LoginType.GOOGLE to googleSignInManager,
+        LoginType.GOOGLE to googleSignInManager,
 //        LoginType.APPLE to appleSignInManager,
         LoginType.NAVER to naverSignInManager, LoginType.KAKAO to kakaoSignInManager)
 

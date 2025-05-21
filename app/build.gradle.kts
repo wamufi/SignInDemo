@@ -28,11 +28,15 @@ android {
         val naverClientSecret: String = gradleLocalProperties(rootDir, providers).getProperty("naver_client_secret")
         val kakaoAppKey: String = gradleLocalProperties(rootDir, providers).getProperty("kakao_app_key")
         val kakaoManifestAppKey: String = gradleLocalProperties(rootDir, providers).getProperty("kakao_manifest_app_key")
+        val googleWebClientId: String = gradleLocalProperties(rootDir, providers).getProperty("google_web_client_id")
+        val googleAssetStatements: String = gradleLocalProperties(rootDir, providers).getProperty("google_asset_statements")
 
         buildConfigField("String", "NAVER_CLIENT_ID", naverClientId)
         buildConfigField("String", "NAVER_CLIENT_SECRET", naverClientSecret)
         buildConfigField("String", "KAKAO_APP_KEY", kakaoAppKey)
         manifestPlaceholders["KAKAO_MANIFEST_APP_KEY"] = kakaoManifestAppKey
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", googleWebClientId)
+        manifestPlaceholders["GOOGLE_ASSET_STATEMENTS"] = googleAssetStatements
     }
 
     buildTypes {
@@ -82,4 +86,7 @@ dependencies {
     // Sign in
     implementation(libs.naver.oauth) // 네이버
     implementation(libs.kakao.user) // 카카오
+    implementation(libs.androidx.credentials) // 구글
+    implementation(libs.androidx.credentials.play.services.auth) // 구글
+    implementation(libs.google.googleid) // 구글
 }

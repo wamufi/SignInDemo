@@ -1,8 +1,10 @@
 package com.wamufi.signindemo
 
 import android.content.Context
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.kakao.sdk.common.KakaoSdk
 import com.navercorp.nid.NaverIdLoginSDK
+import com.wamufi.signindemo.signin.GoogleSignInManager
 import com.wamufi.signindemo.signin.KakaoSignInManager
 import com.wamufi.signindemo.signin.NaverSignInManager
 import dagger.Module
@@ -31,5 +33,11 @@ object SignInModule {
         KakaoSdk.loggingEnabled = true
 
         return KakaoSignInManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun providesGoogleSignInManager(@ApplicationContext context: Context): GoogleSignInManager {
+        return GoogleSignInManager(context)
     }
 }

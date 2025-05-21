@@ -1,5 +1,7 @@
 package com.wamufi.signindemo.ui
 
+import android.app.Activity
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -31,13 +35,9 @@ fun SignInScreen(viewModel: SignInViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(innerPadding)) {
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                AsyncImage(model = uiState.profileImage,
-                    contentDescription = "Profile Image",
-                    modifier = Modifier.size(48.dp))
+                AsyncImage(model = uiState.profileImage, contentDescription = "Profile Image", modifier = Modifier.size(48.dp))
                 Text("name: ${uiState.name}")
                 Text("nickname: ${uiState.nickName}")
                 Text("token: ${uiState.token}")
@@ -45,10 +45,7 @@ fun SignInScreen(viewModel: SignInViewModel = hiltViewModel()) {
 
             HorizontalDivider(modifier = Modifier.padding(16.dp))
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("네이버", style = MaterialTheme.typography.titleMedium)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Button(onClick = {
@@ -72,10 +69,7 @@ fun SignInScreen(viewModel: SignInViewModel = hiltViewModel()) {
                 }
             }
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("카카오", style = MaterialTheme.typography.titleMedium)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Button(onClick = {
@@ -94,6 +88,29 @@ fun SignInScreen(viewModel: SignInViewModel = hiltViewModel()) {
                     Button(onClick = {
                         viewModel.revokeAccess(LoginType.KAKAO)
                     }) {
+                        Text("연동 해제")
+                    }
+                }
+            }
+
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("구글", style = MaterialTheme.typography.titleMedium)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Button(onClick = {
+                        viewModel.signIn(LoginType.GOOGLE, context as Activity)
+                    }) {
+                        Text("로그인")
+                    }
+
+                    Button(onClick = {
+                        viewModel.signOut(LoginType.GOOGLE)
+                    }) {
+                        Text("로그아웃")
+                    }
+
+                    Button(onClick = {
+                        viewModel.revokeAccess(LoginType.GOOGLE)
+                    }, enabled = false) {
                         Text("연동 해제")
                     }
                 }

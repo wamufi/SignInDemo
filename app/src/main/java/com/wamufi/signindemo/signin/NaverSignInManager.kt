@@ -22,7 +22,7 @@ class NaverSignInManager @Inject constructor(private val context: Context) : Sig
     /// 네이버 로그인
     /// FLAG_ACTIVITY_NEW_TASK 업데이트 되면 context 외부에서 전달받지 않고 사용
     /// https://github.com/naver/naveridlogin-sdk-android/issues/125
-    suspend fun signInWithNaver(context: Context): Result<String> = suspendCoroutine { continuation ->
+    private suspend fun signInWithNaver(context: Context): Result<String> = suspendCoroutine { continuation ->
         val oAuthLoginCallback = object : OAuthLoginCallback {
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
@@ -66,7 +66,7 @@ class NaverSignInManager @Inject constructor(private val context: Context) : Sig
     }
 
     /// 네이버 로그아웃
-    fun signOutWithNaver(): Result<Unit> {
+    private fun signOutWithNaver(): Result<Unit> {
         NaverIdLoginSDK.logout()
         if (NaverIdLoginSDK.getState() == NidOAuthLoginState.NEED_LOGIN) {
             return Result.success(Unit)
@@ -76,7 +76,7 @@ class NaverSignInManager @Inject constructor(private val context: Context) : Sig
     }
 
     /// 네이버 연동 해제 (토큰 삭제)
-    suspend fun deleteNaverToken(): Result<Unit> = suspendCoroutine { continuation ->
+    private suspend fun deleteNaverToken(): Result<Unit> = suspendCoroutine { continuation ->
         val oAuthLoginCallback = object : OAuthLoginCallback {
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)

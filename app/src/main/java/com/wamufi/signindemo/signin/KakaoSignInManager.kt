@@ -11,7 +11,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class KakaoSignInManager @Inject constructor(private val context: Context): SignInManager {
+class KakaoSignInManager @Inject constructor(private val context: Context) : SignInManager {
 
     override suspend fun signIn(context: Context?): Result<String> = signInWithKakao()
     override suspend fun signOut(): Result<Unit> = signOutwithKakao()
@@ -54,7 +54,7 @@ class KakaoSignInManager @Inject constructor(private val context: Context): Sign
                 continuation.resume(Result.failure(error))
             } else if (user != null) {
                 continuation.resume(Result.success(user))
-            } else{
+            } else {
                 continuation.resume(Result.failure(Exception("User info is null")))
             }
         }
