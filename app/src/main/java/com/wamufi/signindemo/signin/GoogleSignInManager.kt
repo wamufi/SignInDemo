@@ -8,12 +8,9 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.GetCredentialException
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.wamufi.signindemo.BuildConfig
-import com.wamufi.signindemo.LogHelper
 import javax.inject.Inject
 
 class GoogleSignInManager @Inject constructor(context: Context) : SignInManager {
